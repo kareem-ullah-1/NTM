@@ -1,0 +1,1 @@
+ALTER TABLE collections ADD COLUMN IF NOT EXISTS nav_links JSONB NOT NULL DEFAULT '[]'::jsonb;

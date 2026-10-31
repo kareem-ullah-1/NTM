@@ -1,0 +1,43 @@
+
+node_modules/
+frontend/.next/
+backend/dist/
+
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+dist/
+coverage/
+
+# Local environment files
+frontend/.env.local
+backend/.env
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js build
+**/.next/
+
+# Dependencies
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/coverage/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
