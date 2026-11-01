@@ -9,6 +9,7 @@ export const siteConfig = {
   email: "hello@noorfabrics.pk",
   city: "Faisalabad, Pakistan",
   address: "Susan Road, Faisalabad, Punjab, Pakistan",
+  mapCoordinates: undefined as { lat: number; lng: number } | undefined,
   social: {
     instagram: "https://instagram.com/noorfabrics",
     facebook: "https://facebook.com/noorfabrics"

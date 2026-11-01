@@ -86,7 +86,7 @@ export default function ContactPage() {
               Send us a message
             </h2>
             <p className="mt-1.5 text-[13px] text-charcoal/50">
-              Fill in the form below and we'll get back to you shortly.
+              Fill in the form below and we&apos;ll get back to you shortly.
             </p>
             <div className="mt-7">
               <ContactForm />

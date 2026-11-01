@@ -159,11 +159,6 @@ function ActionMenu({
   const canDelete = isSuperAdmin && !isSelf && !memberIsSuperAdmin;
   const showDeleteDisabled = isSuperAdmin && (isSelf || memberIsSuperAdmin);
 
-  const hasAnyAction = canChangeRole || canToggleStatus || canDelete || showDeleteDisabled || true;
-  if (!hasAnyAction) {
-    return null;
-  }
-
   React.useEffect(() => {
     if (!open) return;
     function handleClickOutside(e: MouseEvent) {
@@ -1238,7 +1233,7 @@ function ToggleStatusDialog({
           <DialogDescription>
             {isDisabling
               ? `${member?.name} will no longer be able to access the admin area. They will be logged out immediately.`
-              : `Restore ${member?.name}'s access to the admin area.`}
+              : `Restore ${member?.name}&apos;s access to the admin area.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -1264,7 +1259,7 @@ function ToggleStatusDialog({
         {isDisabling && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
             <p className="text-[12px] text-amber-700">
-              This action will immediately revoke {member?.name}'s access to
+              This action will immediately revoke {member?.name}&apos;s access to
               all admin areas. They will need to be re-enabled to regain
               access.
             </p>
@@ -1313,7 +1308,7 @@ function PermissionsDialog({
         <DialogHeader>
           <DialogTitle>Permissions</DialogTitle>
           <DialogDescription>
-            {member?.name}'s effective permissions based on their{" "}
+            {member?.name}&apos;s effective permissions based on their{" "}
             {member ? ROLE_LABELS[member.adminRole] : ""} role.
           </DialogDescription>
         </DialogHeader>
