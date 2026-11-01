@@ -1,3 +1,1 @@
-import { createApp } from "../src/app";
-
-export default createApp();
+export { default } from "../src/app";

@@ -1,4 +1,4 @@
-import { createApp } from "./app";
+import app from "./app";
 import { env, smtpConfigSummary } from "./config/env";
 import { checkDbConnection, checkRequiredTables } from "./config/db";
 import { initRedis } from "./config/redis";
@@ -51,8 +51,6 @@ async function bootstrap(): Promise<void> {
       "[Email] Order confirmation emails will be skipped until SMTP_HOST, SMTP_USER, and SMTP_PASSWORD are set in the server environment."
     );
   }
-
-  const app = createApp();
 
   app.listen(env.port, () => {
     console.log(`NTM Fabrics API listening on port ${env.port} [${env.nodeEnv}]`);
