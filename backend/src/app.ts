@@ -20,6 +20,14 @@ export function createApp(): Application {
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan(isProduction ? "combined" : "dev"));
 
+  app.get("/", (_req, res) => {
+    res.status(200).json({
+      success: true,
+      message: "NTM Fabrics API is running",
+      data: { service: "NTM Fabrics API", status: "ok" }
+    });
+  });
+
   app.use("/api", apiRateLimiter);
   app.use("/api/auth/login", authRateLimiter);
   app.use("/api/auth/register", authRateLimiter);
