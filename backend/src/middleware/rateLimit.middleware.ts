@@ -1,23 +1,78 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, {
+  MemoryStore,
+  type ClientRateLimitInfo,
+  type Options,
+  type Store
+} from "express-rate-limit";
 import { RedisStore, type RedisReply } from "rate-limit-redis";
-import { ensureRedisClient } from "../config/redis";
+import { connectRedis, ensureRedisClient, isRedisConfigured, markRedisFailure } from "../config/redis";
 
-/**
- * Build a Redis-backed store when REDIS_URL is configured.
- * The client is created lazily; ioredis queues commands until connected.
- * When no Redis URL is set we return undefined so express-rate-limit uses MemoryStore.
- */
-function createStore(prefix: string) {
-  const client = ensureRedisClient();
-  if (!client) {
-    return undefined;
+class ResilientStore implements Store {
+  localKeys = false;
+  private readonly memory = new MemoryStore();
+  private redis: RedisStore | null = null;
+  private options: Options | null = null;
+
+  constructor(private readonly name: string) {}
+
+  init(options: Options): void {
+    this.options = options;
+    this.memory.init(options);
   }
 
-  return new RedisStore({
-    prefix: `rl:${prefix}:`,
-    sendCommand: (command: string, ...args: string[]) =>
-      client.call(command, ...args) as Promise<RedisReply>
-  });
+  private async redisStore(): Promise<RedisStore | null> {
+    if (!(await connectRedis())) return null;
+    if (this.redis) return this.redis;
+
+    const client = ensureRedisClient();
+    if (!client || !this.options) return null;
+
+    const store = new RedisStore({
+      prefix: `rl:${this.name}:`,
+      sendCommand: (command: string, ...args: string[]) =>
+        client.call(command, ...args) as Promise<RedisReply>
+    });
+    store.init(this.options);
+
+    try {
+      await Promise.all([store.incrementScriptSha, store.getScriptSha]);
+    } catch {
+      markRedisFailure();
+      return null;
+    }
+
+    this.redis = store;
+    return store;
+  }
+
+  async increment(key: string): Promise<ClientRateLimitInfo> {
+    const store = await this.redisStore().catch(() => null);
+    if (store) {
+      try {
+        return await store.increment(key);
+      } catch {
+        this.redis = null;
+        markRedisFailure();
+      }
+    }
+    return this.memory.increment(key);
+  }
+
+  async decrement(key: string): Promise<void> {
+    this.memory.decrement(key);
+    const store = await this.redisStore().catch(() => null);
+    await store?.decrement(key).catch(() => undefined);
+  }
+
+  async resetKey(key: string): Promise<void> {
+    this.memory.resetKey(key);
+    const store = await this.redisStore().catch(() => null);
+    await store?.resetKey(key).catch(() => undefined);
+  }
+}
+
+function createStore(name: string): Store | undefined {
+  return isRedisConfigured() ? new ResilientStore(name) : undefined;
 }
 
 const common = {

@@ -12,6 +12,10 @@ import { apiRateLimiter, authRateLimiter } from "./middleware/rateLimit.middlewa
 export function createApp(): Application {
   const app = express();
 
+  if (process.env.VERCEL) {
+    app.set("trust proxy", 1);
+  }
+
   app.disable("x-powered-by");
   app.use(helmet());
   app.use(cors(corsOptions));
